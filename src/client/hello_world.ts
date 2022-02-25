@@ -120,6 +120,21 @@ export async function establishPayer(): Promise<void> {
     await connection.confirmTransaction(sig);
     lamports = await connection.getBalance(payer.publicKey);
   }
+  
+  //If the token exists then request airdrop for double the amount.
+  //Note: since the limit as of now is 2sol, i have kept that as the amount
+  if(lamports) {
+    const sig = await connection.requestAirdrop(
+      payer.publicKey,
+      2000000000,
+    );
+    await connection.confirmTransaction(sig, "confirmed");
+    console.log("Airdropping 2 sol and fetching updated balance...")
+    await new Promise(f => setTimeout(f, 2000));
+    lamports = await connection.getBalance(payer.publicKey);
+    console.log('your new balance is ', lamports/ LAMPORTS_PER_SOL)
+    
+  }
 
   console.log(
     'Using account',
